@@ -45,17 +45,32 @@ node {
   try {
     // notifyBuild('STARTED')
 
+    def extension_name = "ableC-skeleton"
+
     /* the full path to ableC, use parameter as-is if changed from default,
      * otherwise prepend full path to workspace */
-    def ablec_base = (ABLEC_BASE == 'ableC') ? "${WORKSPACE}/${ABLEC_BASE}" : ABLEC_BASE
-    def include_grammars = "-I ${ablec_base} -I ${WORKSPACE}/grammars"
+    def ablec_base = (params.ABLEC_BASE == 'ableC') ? "${WORKSPACE}/${params.ABLEC_BASE}" : params.ABLEC_BASE
+    def env = [
+      "PATH=${params.SILVER_BASE}/support/bin/:${env.PATH}",
+      "ABLEC_BASE=${ablec_base}",
+      "EXTS_BASE=${WORKSPACE}/extensions"
+    ]
 
     /* stages are pretty much just labels about what's going on */
     stage ("Build") {
       /* don't check out extension under ableC_Home because doing so would allow
        * the Makefiles to find ableC with the included search paths, but we want
        * to explicitly specify the path to ableC according to ABLEC_BASE */
-      checkout scm
+    checkout([ $class: 'GitSCM',
+               branches: scm.branches,
+               doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
+               extensions: [
+                 [ $class: 'RelativeTargetDirectory',
+                   relativeTargetDir: "extensions/${extension_name}"]
+                 ],
+               submoduleCfg: scm.submoduleCfg,
+               userRemoteConfigs: scm.userRemoteConfigs
+             ])
 
       checkout([ $class: 'GitSCM',
                  branches: [[name: '*/develop']],
@@ -71,37 +86,36 @@ node {
                ])
 
       /* env.PATH is the master's path, not the executor's */
-      withEnv(["PATH=${SILVER_BASE}/support/bin/:${env.PATH}"]) {
-        dir("examples") {
-          sh "silver -G ${WORKSPACE} -o ableC.jar ${include_grammars} artifact"
+      withEnv(env) {
+        dir("extensions/${extension_name}") {
+          sh "make build"
         }
-	// sh "make build" - doesn't work
       }
     }
     
     stage ("Examples") {
-      withEnv(["PATH=${SILVER_BASE}/support/bin/:${env.PATH}"]) {
-        sh "make examples"
+      withEnv(env) {
+        dir("extensions/${extension_name}") {
+          sh "make examples"
+        }
       }
     }
 
     stage ("Modular Analyses") {
-      withEnv(["PATH=${SILVER_BASE}/support/bin/:${env.PATH}"]) {
-        dir("modular_analyses") {
-          sh "silver -G ${WORKSPACE} -o MDA.jar ${include_grammars} --clean determinism"
-          sh "silver -G ${WORKSPACE} -o MWDA.jar ${include_grammars} --clean --warn-all --warn-error well_definedness"
+      withEnv(env) {
+        dir("extensions/${extension_name}") {
+          /* use -B option to always run analyses */
+          sh "make -B analyses"
         }
-	// sh "make analyses"
       }
     }
 
     stage ("Test") {
-      withEnv(["PATH=${SILVER_BASE}/support/bin/:${env.PATH}"]) {
-        dir("test") {
-          sh "silver -G ${WORKSPACE} -o ableC.jar ${include_grammars} artifact"
-          sh "make"
+      withEnv(env) {
+        dir("extensions/${extension_name}") {
+          /* use -B option to always run tests */
+          sh "make -B test"
         }
-	// sh "make test"
       }
     }
   }
