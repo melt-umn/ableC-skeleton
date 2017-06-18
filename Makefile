@@ -31,5 +31,5 @@ clean:
 	@cd modular_analyses && $(MAKE) clean
 	@cd test && $(MAKE) clean
 
-.PHONY: all examples analyses mda mwda test clean
+.PHONY: all build examples analyses mda mwda test clean
 .NOTPARALLEL: # Avoid running multiple Silver builds in parallel
