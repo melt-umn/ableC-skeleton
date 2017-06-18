@@ -31,7 +31,7 @@ TESTS=$(XC_FILES:.xc=.test)
 # All directories contining extension header files that may be included
 XC_INCLUDE_DIRS=$(wildcard $(EXTS_BASE)/*/include)
 # Flags passed to ableC including the appropriate directories
-XCFLAGS=$(addprefix -I, $(XC_INCLUDE_DIRS))
+XCFLAGS=$(addprefix -I,$(XC_INCLUDE_DIRS))
 
 # Flags passed to the C compiler, e.g. to enable various compiler extensions
 CFLAGS=
@@ -39,11 +39,21 @@ CFLAGS=
 # All directories contining extension libraries that may be linked
 LIB_DIRS=$(wildcard $(EXTS_BASE)/*/lib)
 # Flags passed to the linker specifying the appropriate directories
-LDFLAGS=$(addprefix -L, $(LIB_DIRS))
-# Flags passed to the linker specifying libraries to link
-LDLIBS=
+LDFLAGS=$(addprefix -L,$(LIB_DIRS))
+# Specify skeleton is to be linked staticlly, everything else dynamically
+LDLIBS=-Wl,-Bstatic -lskeleton -Wl,-Bdynamic
+
+# All directories contining extension library sources
+LIBRARIES_DIRS=$(wildcard $(EXTS_BASE)/*/libraries)
+# All C files used to build libraries, to be included as dependancies
+LIBRARIES_SOURCES=$(foreach dir,$(LIBRARIES_DIRS),$(wildcard $(dir)/*.c))
 
 all: $(ABLEC_JAR) $(C_FILES) $(OBJECTS) $(EXECUTABLES) $(TESTS)
+
+libraries: $(LIBRARIES_DIRS)
+
+$(LIBRARIES_DIRS):
+	@cd $@ && $(MAKE)
 
 $(ABLEC_JAR): $(GRAMMAR_SOURCES)
 	touch $(wildcard $(ARTIFACT)/*.sv)
@@ -52,12 +62,12 @@ $(ABLEC_JAR): $(GRAMMAR_SOURCES)
 %.c: %.xc $(ABLEC_JAR)
 	java -jar $(ABLEC_JAR) $< $(XCFLAGS)
 
-%.out: %.o
+%.out: %.o $(LIBRARIES_SOURCES) | libraries
 	$(CC) $(LDFLAGS) $< $(LOADLIBES) $(LDLIBS) -o $@
 
 translate_error/%.test: translate_error/%.xc $(ABLEC_JAR)
 	@echo "java -jar $(ABLEC_JAR) $< $(XCFLAGS)"
-	@if java -jar $(ABLEC_JAR) $< $(XCFLAGS); then exit 1; fi
+	@if java -jar $(ABLEC_JAR) $< $(XCFLAGS); then echo "Failed to error"; exit 1; fi
 	touch $@
 
 runtime_error/%.test: runtime_error/%.out
@@ -72,4 +82,4 @@ runtime_error/%.test: runtime_error/%.out
 clean:
 	rm -f *~ build.xml */*.i */*.c */*.o */*.out */*.test *.jar *.copperdump.html build.xml
 
-.PHONY: all clean
+.PHONY: all libraries $(LIBRARIES_DIRS) clean
