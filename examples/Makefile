@@ -43,16 +43,18 @@ LDFLAGS=$(addprefix -L,$(LIB_DIRS))
 LDLIBS=-Wl,-Bstatic -lskeleton -Wl,-Bdynamic
 
 # All directories contining extension library sources
-LIBRARIES_DIRS=$(wildcard $(EXTS_BASE)/*/libraries)
-# All C files used to build libraries, to be included as dependancies
-LIBRARIES_SOURCES=$(foreach dir,$(LIBRARIES_DIRS),$(wildcard $(dir)/*.c))
+SRC_DIRS=$(wildcard $(EXTS_BASE)/*/src)
+# All extension library targets
+LIBS=$(SRC_DIRS:src=libs)
+# All C files used to build libraries, to be included as dependencies
+SRC_SOURCES=$(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 
 all: $(ABLEC_JAR) $(C_FILES) $(OBJECTS) $(EXECUTABLES) $(TESTS)
 
-libraries: $(LIBRARIES_DIRS)
+libs: $(LIBS)
 
-$(LIBRARIES_DIRS):
-	@cd $@ && $(MAKE)
+$(LIBS):
+	@cd $(@:libs=src) && $(MAKE)
 
 $(ABLEC_JAR): $(GRAMMAR_SOURCES)
 	touch $(wildcard $(ARTIFACT)/*.sv)
@@ -61,7 +63,7 @@ $(ABLEC_JAR): $(GRAMMAR_SOURCES)
 %.c: %.xc $(ABLEC_JAR)
 	java -jar $(ABLEC_JAR) $< $(XCFLAGS)
 
-%.out: %.o $(LIBRARIES_SOURCES) | libraries
+%.out: %.o $(SRC_SOURCES) | libs
 	$(CC) $(LDFLAGS) $< $(LOADLIBES) $(LDLIBS) -o $@
 
 %.test: %.out
@@ -72,4 +74,4 @@ $(ABLEC_JAR): $(GRAMMAR_SOURCES)
 clean:
 	rm -f *~ *.i *.c *.o *.out *.test *.jar *.copperdump.html build.xml
 
-.PHONY: all libraries $(LIBRARIES_DIRS) clean
+.PHONY: all libs $(LIBS) clean
