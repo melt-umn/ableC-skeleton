@@ -59,6 +59,11 @@ node {
 
     /* stages are pretty much just labels about what's going on */
     stage ("Build") {
+      /******** TEMPORARY: while this Jenkinsfile is in flux, whack the workspace hard */
+      stash includes: 'extensions/,ableC/', name: 'old'
+      deleteDir()
+      unstash 'old'
+
       /* Clean Silver-generated files from previous builds in this workspace */
       sh "mkdir -p generated"
       sh "rm -rf generated/* || true"
@@ -71,7 +76,8 @@ node {
                doGenerateSubmoduleConfigurations: scm.doGenerateSubmoduleConfigurations,
                extensions: [
                  [ $class: 'RelativeTargetDirectory',
-                   relativeTargetDir: "extensions/${extension_name}"]
+                   relativeTargetDir: "extensions/${extension_name}"],
+                 [ $class: 'CleanCheckout']
                  ],
                submoduleCfg: scm.submoduleCfg,
                userRemoteConfigs: scm.userRemoteConfigs
@@ -79,12 +85,11 @@ node {
 
       checkout([ $class: 'GitSCM',
                  branches: [[name: '*/develop']],
-                 doGenerateSubmoduleConfigurations: false,
                  extensions: [
                    [ $class: 'RelativeTargetDirectory',
-                     relativeTargetDir: 'ableC']
+                     relativeTargetDir: 'ableC'],
+                   [ $class: 'CleanCheckout']
                  ],
-                 submoduleCfg: [],
                  userRemoteConfigs: [
                    [url: 'https://github.com/melt-umn/ableC.git']
                  ]
