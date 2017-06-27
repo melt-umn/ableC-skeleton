@@ -40,8 +40,8 @@ CFLAGS=
 LIB_DIRS=$(wildcard $(EXTS_BASE)/*/lib)
 # Flags passed to the linker specifying the appropriate directories
 LDFLAGS=$(addprefix -L,$(LIB_DIRS))
-# Specify skeleton is to be linked staticlly, everything else dynamically
-LDLIBS=-Wl,-Bstatic -lskeleton -Wl,-Bdynamic
+# Flags passed to the linker specifying libraries to link
+LDLIBS=
 
 # All directories contining extension library sources
 SRC_DIRS=$(wildcard $(EXTS_BASE)/*/src)
