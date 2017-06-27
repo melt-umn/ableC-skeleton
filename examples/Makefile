@@ -53,7 +53,6 @@ all: $(ABLEC_JAR) $(C_FILES) $(OBJECTS) $(EXECUTABLES) $(TESTS)
 libs: $(LIBS)
 
 $(LIBS):
-	echo $(LIBS)
 	cd $(@:libs=src) && $(MAKE)
 
 $(ABLEC_JAR): $(GRAMMAR_SOURCES)
