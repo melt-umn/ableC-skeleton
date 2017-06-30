@@ -60,9 +60,9 @@ node {
     /* stages are pretty much just labels about what's going on */
     stage ("Build") {
       /******** TEMPORARY: while this Jenkinsfile is in flux, whack the workspace hard */
-      stash includes: "extensions/${extension_name}/,ableC/", name: 'old', useDefaultExcludes: false
-      deleteDir()
-      unstash 'old'
+      //stash includes: "extensions/${extension_name}/,ableC/", name: 'old', useDefaultExcludes: false
+      //deleteDir()
+      //unstash 'old'
 
       /* Clean Silver-generated files from previous builds in this workspace */
       sh "mkdir -p generated"
