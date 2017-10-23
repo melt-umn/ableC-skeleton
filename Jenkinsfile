@@ -101,7 +101,7 @@ node {
                    ]
                  ])
       }
-      except (e) {
+      catch (e) {
         checkout([ $class: 'GitSCM',
                    branches: [[name: '*/develop']],
                    doGenerateSubmoduleConfigurations: false,
