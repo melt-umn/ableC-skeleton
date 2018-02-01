@@ -54,7 +54,7 @@ node {
     melt.handle(e)
   }
   finally {
-    melt.notify(extension_name)
+    melt.notify(job: extension_name)
   }
 }
 
