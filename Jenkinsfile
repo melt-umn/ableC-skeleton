@@ -2,7 +2,7 @@
 
 library "github.com/melt-umn/jenkins-lib"
 
-melt.setProperties silverBase: true, ablecBase: true
+melt.setProperties(silverBase: true, ablecBase: true)
 
 def extension_name = "ableC-skeleton"
 def newenv
