@@ -7,7 +7,7 @@ grammar determinism;
 
 import edu:umn:cs:melt:ableC:host;
 
-copper_mda testStmt(ablecParser) {
-  edu:umn:cs:melt:exts:ableC:skeleton;
+copper_mda testConcreteSyntax(ablecParser) {
+  edu:umn:cs:melt:exts:ableC:skeleton:concretesyntax;
 }
 
