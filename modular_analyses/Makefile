@@ -4,7 +4,7 @@ ABLEC_BASE?=../../../ableC
 # Path from current directory to top level extensions directory
 EXTS_BASE?=../../../extensions
 
-# The jar files to built
+# The jar files to build
 MDA_JAR=MDA.jar
 MWDA_JAR=MWDA.jar
 # The artifact specification grammars to compile

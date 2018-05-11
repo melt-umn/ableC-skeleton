@@ -4,7 +4,7 @@ ABLEC_BASE?=../../../ableC
 # Path from current directory to top level extensions directory
 EXTS_BASE?=../../../extensions
 
-# The jar file to built
+# The jar file to build
 ABLEC_JAR=ableC.jar
 # The artifact specification grammar to compile
 ARTIFACT=artifact
