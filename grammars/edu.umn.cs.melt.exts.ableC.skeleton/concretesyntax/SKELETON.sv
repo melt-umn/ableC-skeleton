@@ -10,5 +10,5 @@ marking terminal Skeleton_t 'skeleton!' ;
 concrete production skeleton_c
 s::Stmt_c ::= sk::Skeleton_t
 {
-  s.ast = skeleton( sk.location );
+  s.ast = skeleton();
 }
