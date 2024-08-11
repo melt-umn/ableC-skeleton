@@ -6,5 +6,5 @@ the extension work.  It may also be used in testing that the extension
 works properly - though there is no real testing to do for this silly
 extension.
 
-To build the examples, run `make`.  This will compile the grammars to
+To build the examples, run `./build-and-run`.  This will compile the grammars to
 produce a jar, and use this to translate, compile, and run the examples.

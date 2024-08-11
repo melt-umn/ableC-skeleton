@@ -1,4 +1,4 @@
-grammar determinism;
+grammar edu:umn:cs:melt:exts:ableC:skeleton:artifacts:mda_test;
 
 {- This Silver specification does not generate a useful working 
    compiler, it only serves as a grammar for running the modular
