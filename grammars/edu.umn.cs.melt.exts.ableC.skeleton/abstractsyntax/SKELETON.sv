@@ -1,13 +1,14 @@
 grammar edu:umn:cs:melt:exts:ableC:skeleton:abstractsyntax;
 
 imports edu:umn:cs:melt:ableC:abstractsyntax:host;
-
+imports silver:langutil;
 
 abstract production skeleton
-s::Stmt ::= loc::Location
+s::Stmt ::=
 {
+  attachNote extensionGenerated("ableC-skeleton");
   local printStmts :: [Stmt] 
-    = map (mkSkeletonLinePrint(loc,_), skeletonLines);
+    = map (mkSkeletonLinePrint, skeletonLines);
 
   forwards to 
     foldl1 (seqStmt, printStmts);
@@ -62,7 +63,7 @@ s::Stmt ::= loc::Location
 }
 
 function mkSkeletonLinePrint
-Stmt ::= loc::Location skeletonLine::String
+Stmt ::= skeletonLine::String
 {
   local strForPrintf :: String =
     "\"" ++ skeletonLine ++ "\\n\"" ;
@@ -70,10 +71,9 @@ Stmt ::= loc::Location skeletonLine::String
   return
     exprStmt(
       directCallExpr( 
-        name("printf", location=loc),
-        consExpr( stringLiteral(strForPrintf, location=loc),
-	          nilExpr() ),
-        location=loc
+        name("printf"),
+        consExpr( stringLiteral(strForPrintf),
+	          nilExpr() )
       )
     ) ;
 }
